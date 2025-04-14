@@ -10,7 +10,7 @@ import { isUserAvailable } from "../middleware/auth.js";
 const router = Router();
 
 router.get("/", isUserAvailable, start);
-router.post("/register", registerUser);
+router.post("/register", registerUser); // No trailing slash
 router.post("/login", loginUser);
 router.get("/logout", isUserAvailable, logoutUser);
 
