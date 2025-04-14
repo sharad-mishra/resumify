@@ -10,7 +10,12 @@ const app = express();
 
 // Add CORS configuration before any routes
 app.use(cors({
-    origin: ['https://resumify.me', 'https://www.resumify.me', 'https://resumify-tau.vercel.app'],
+    origin: [
+        'http://localhost:5173',
+        'https://resumify.me', 
+        'https://www.resumify.me', 
+        'https://resumify-tau.vercel.app'
+    ],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'Origin'],

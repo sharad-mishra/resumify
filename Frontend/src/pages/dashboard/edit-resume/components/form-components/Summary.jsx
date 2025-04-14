@@ -9,13 +9,27 @@ import { toast } from "sonner";
 import { AIChatSession } from "@/Services/AiModel";
 import { updateThisResume } from "@/Services/resumeAPI";
 
-const prompt =
-  "Job Title: {jobTitle} , Depends on job title give me list of  summery for 3 experience level, Mid Level and Freasher level in 3 -4 lines in array format, With summery and experience_level Field in JSON Format";
+const prompt = `For the position of {jobTitle}, generate a JSON array of 3 professional summaries in the following format:
+[
+  {
+    "experience_level": "Senior Level",
+    "summary": "Experienced professional with strong leadership skills..."
+  },
+  {
+    "experience_level": "Mid Level",
+    "summary": "Results-driven professional with proven expertise..."
+  },
+  {
+    "experience_level": "Fresher Level",
+    "summary": "Enthusiastic graduate with fundamental knowledge..."
+  }
+]. Each summary should be 3-4 lines long and tailored to the experience level.`;
+
 function Summary({ resumeInfo, enanbledNext, enanbledPrev }) {
   const dispatch = useDispatch();
-  const [loading, setLoading] = useState(false); // Declare the undeclared variable using useState
-  const [summary, setSummary] = useState(resumeInfo?.summary || ""); // Declare the undeclared variable using useState
-  const [aiGeneratedSummeryList, setAiGenerateSummeryList] = useState(null); // Declare the undeclared variable using useState
+  const [loading, setLoading] = useState(false);
+  const [summary, setSummary] = useState(resumeInfo?.summary || "");
+  const [aiGeneratedSummeryList, setAiGeneratedSummeryList] = useState([]);
   const { resume_id } = useParams();
 
   const handleInputChange = (e) => {
@@ -51,7 +65,7 @@ function Summary({ resumeInfo, enanbledNext, enanbledPrev }) {
           setLoading(false);
         });
     }
-  }; // Declare the undeclared variable using useState
+  };
 
   const setSummery = (summary) => {
     dispatch(
@@ -74,12 +88,27 @@ function Summary({ resumeInfo, enanbledNext, enanbledPrev }) {
     const PROMPT = prompt.replace("{jobTitle}", resumeInfo?.jobTitle);
     try {
       const result = await AIChatSession.sendMessage(PROMPT);
-      console.log(JSON.parse(result.response.text()));
-      setAiGenerateSummeryList(JSON.parse(result.response.text()));
-      toast("Summery Generated", "success");
+      const summaryText = result.response.text();
+
+      // Parse the JSON response
+      try {
+        const parsedSummaries = JSON.parse(summaryText);
+        if (Array.isArray(parsedSummaries)) {
+          setAiGeneratedSummeryList(parsedSummaries);
+        } else {
+          throw new Error("Invalid response format");
+        }
+      } catch (parseError) {
+        console.error("Failed to parse AI response:", parseError);
+        toast.error("Failed to generate summaries");
+        setAiGeneratedSummeryList([]);
+      }
+      
+      toast.success("Summaries Generated");
     } catch (error) {
-      console.log(error);
-      toast("${error.message}", `${error.message}`);
+      console.error("AI Generation Error:", error);
+      toast.error(error.message);
+      setAiGeneratedSummeryList([]);
     } finally {
       setLoading(false);
     }
@@ -122,7 +151,7 @@ function Summary({ resumeInfo, enanbledNext, enanbledPrev }) {
       {aiGeneratedSummeryList && (
         <div className="my-5">
           <h2 className="font-bold text-lg">Suggestions</h2>
-          {aiGeneratedSummeryList?.map((item, index) => (
+          {(aiGeneratedSummeryList || []).map((item, index) => (
             <div
               key={index}
               onClick={() => {
