@@ -11,10 +11,16 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-
 const corsOptions = {
-    origin: [process.env.ALLOWED_SITE],
-    credentials: true
+    origin: [
+        process.env.ALLOWED_SITE, 
+        'https://resumify.me',
+        'https://www.resumify.me',
+        'https://resumify-tau.vercel.app/'
+    ],
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
 };
 
 app.use(cors(corsOptions));
