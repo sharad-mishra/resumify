@@ -55,14 +55,16 @@ const logoutUser = async () => {
 
 export const signUpUser = async (userData) => {
   try {
-    const response = await axios.post(`${import.meta.env.VITE_APP_URL}api/users/signup`, userData, {
+    const response = await axios.post(`${import.meta.env.VITE_APP_URL}api/users/register`, userData, {
       withCredentials: true,
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
       }
     });
     return response;
   } catch (error) {
+    console.error("Signup Error:", error?.response?.data || error.message);
     throw error;
   }
 };
