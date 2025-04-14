@@ -22,16 +22,25 @@ const corsOptions = {
         
         console.log('Incoming request from origin:', origin);
         
-        if (!origin || allowedOrigins.includes(origin)) {
-            callback(null, true);
+        // Allow requests with no origin (like mobile apps or curl requests)
+        if (!origin) {
+            return callback(null, true);
+        }
+
+        if (allowedOrigins.includes(origin)) {
+            const corsOptions = {
+                credentials: true,
+                origin: true
+            };
+            return callback(null, corsOptions);
         } else {
             console.log('Blocked origin:', origin);
-            callback(new Error('Not allowed by CORS'));
+            return callback(new Error('Not allowed by CORS'));
         }
     },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'Origin'],
     exposedHeaders: ['Access-Control-Allow-Origin'],
     optionsSuccessStatus: 200
 };
