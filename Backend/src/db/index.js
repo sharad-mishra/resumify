@@ -1,17 +1,23 @@
 import mongoose from "mongoose";
-import { ApiError } from "../utils/ApiError.js";
 
-const connectDB = async () => {
-  try {
-    const conn = await mongoose.connect(process.env.MONGODB_URI, {
-      dbName: "ai_resume_builder",
-    });
+export const connectDB = async () => {
+    try {
+        console.log("Attempting to connect to MongoDB...");
+        console.log("Connection string:", process.env.MONGODB_URI?.split('@')[1]); // Safely log partial URI
 
-    console.log(`MongoDB Connected: ${conn.connection.host}`);
-    return conn;
-  } catch (err) {
-    throw new ApiError(500, "Database connection failed", [], err.stack);
-  }
+        const connection = await mongoose.connect(process.env.MONGODB_URI);
+        
+        console.log("\nMongoDB Connection Details:");
+        console.log("Host:", connection.connection.host);
+        console.log("Database:", connection.connection.name);
+        console.log("Port:", connection.connection.port);
+        console.log("State:", connection.connection.readyState === 1 ? "Connected" : "Not Connected");
+
+        return connection;
+    } catch (error) {
+        console.error("\nMongoDB Connection Error:");
+        console.error("Error Name:", error.name);
+        console.error("Error Message:", error.message);
+        process.exit(1);
+    }
 };
-
-export { connectDB };

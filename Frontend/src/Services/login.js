@@ -53,4 +53,18 @@ const logoutUser = async () => {
   }
 };
 
+export const signUpUser = async (userData) => {
+  try {
+    const response = await axios.post(`${import.meta.env.VITE_APP_URL}api/users/signup`, userData, {
+      withCredentials: true,
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
+
 export { startUser, registerUser, loginUser, logoutUser };
